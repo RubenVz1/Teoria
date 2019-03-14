@@ -13,6 +13,8 @@ public:
 	cocos2d::Vector<cocos2d::Node*> MenuItems;
 	void addCredits();
 	void changeOpacityLabel(float dt);
+	void goToMenu(float dt);
+	void addNodes(Ref* pSender);
 };
 
 #endif // __INTRO_SCENE_H__

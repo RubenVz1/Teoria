@@ -13,7 +13,7 @@ void Intro::changeOpacityLabel(float dt)
 	float opacity = MenuItems.at(0)->getOpacity();
 	if (opacity >= 240)
 		return;
-	opacity += 20.0;
+	opacity += 4.25;
 	for (int i = 0; i < MenuItems.size(); i++)
 		MenuItems.at(i)->setOpacity(opacity);
 }
@@ -110,7 +110,7 @@ void Intro::addCredits()
 
 bool Intro::init()
 {
-    if ( !Scene::init() )
+    if ( !Scene::initWithPhysics() )
     {
         return false;
     }
@@ -127,8 +127,56 @@ bool Intro::init()
 
 	addCredits();
 
-	this->schedule(CC_SCHEDULE_SELECTOR(Intro::changeOpacityLabel), 0.2f);
+	this->schedule(CC_SCHEDULE_SELECTOR(Intro::changeOpacityLabel), 0.0166f, CC_REPEAT_FOREVER, 2.0f);
+
+	//this->scheduleOnce(schedule_selector(Intro::goToMenu), 5.0f);  quitar cuando se cree la escena menu
+
+	auto labelExit = Label::createWithTTF("Nuevo nodo", "fonts/Marker Felt.ttf", 24);
+	labelExit->enableOutline(Color4B::BLACK, 1);
+
+	auto item_3 = MenuItemLabel::create(labelExit, CC_CALLBACK_1(Intro::addNodes, this));
+	item_3->setAnchorPoint(Vec2(0.5f, 0.5f));
+	item_3->setPosition(Vec2(x, y));
+
+	auto menu = Menu::createWithItem(item_3);
+	menu->setPosition(Vec2::ZERO);
+	this->addChild(menu,1);
+
+	this->getPhysicsWorld()->setGravity(Vec2::ZERO);
 
     return true;
+}
+
+void Intro::addNodes(Ref* pSender)
+{
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	float x = (visibleSize.width / 2) + 60;
+	float y = (visibleSize.width / 2) + 60;
+
+	auto nodo = Sprite::create("images/nodo.png");
+	nodo->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
+	nodo->setPosition(x, y);
+	nodo->setScale(2.0f);
+	
+	auto r = random(0, 255);
+	auto g = random(0, 255);
+	auto b = random(0, 255);
+	
+	nodo->setColor(Color3B(r, g, b));
+
+	auto radiu = nodo->getContentSize().height / 2;
+
+	auto nodo_body = PhysicsBody::createCircle(radiu,PHYSICSBODY_MATERIAL_DEFAULT,Vec2(x,y));
+
+	nodo->setPhysicsBody(nodo_body);
+
+	this->addChild(nodo, 1);
+}
+
+
+void Intro::goToMenu(float dt)
+{
+	auto scene = Intro::createScene(); //Cambiar Intro por Menus
+	Director::getInstance()->replaceScene(TransitionFade::create(0.5f, scene));
 }
 

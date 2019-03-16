@@ -1,4 +1,5 @@
 #include "IntroScene.h"
+#include "MenusScene.h"
 #include "SimpleAudioEngine.h"
 
 USING_NS_CC;
@@ -21,6 +22,7 @@ void Intro::changeOpacityLabel(float dt)
 void Intro::addCredits()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
+
 	float x = visibleSize.width / 2;
 	float y = 7 * visibleSize.height / 8;
 
@@ -31,7 +33,6 @@ void Intro::addCredits()
 	label_1->setOpacity(0);
 	MenuItems.pushBack(label_1);
 
-
 	x = visibleSize.width / 2;
 	y = 6 * visibleSize.height / 8;
 
@@ -41,7 +42,6 @@ void Intro::addCredits()
 	label_2->setPosition(x, y);
 	label_2->setOpacity(0);
 	MenuItems.pushBack(label_2);
-
 
 	x = visibleSize.width / 2;
 	y = 4.5 * visibleSize.height / 8;
@@ -105,17 +105,17 @@ void Intro::addCredits()
 
 	for (int i = 0; i < MenuItems.size() ; i++)
 		this->addChild(MenuItems.at(i), 1);
-
 }
 
 bool Intro::init()
 {
-    if ( !Scene::initWithPhysics() )
+    if (!Scene::init())
     {
         return false;
     }
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
+
 	float x = visibleSize.width / 2;
 	float y = visibleSize.height / 2;
 
@@ -123,60 +123,20 @@ bool Intro::init()
 	background->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
 	background->setPosition(x, y);
 	background->setScale(0.6f);
+
 	this->addChild(background, 0);
 
 	addCredits();
 
 	this->schedule(CC_SCHEDULE_SELECTOR(Intro::changeOpacityLabel), 0.0166f, CC_REPEAT_FOREVER, 2.0f);
-
-	//this->scheduleOnce(schedule_selector(Intro::goToMenu), 5.0f);  quitar cuando se cree la escena menu
-
-	auto labelExit = Label::createWithTTF("Nuevo nodo", "fonts/Marker Felt.ttf", 24);
-	labelExit->enableOutline(Color4B::BLACK, 1);
-
-	auto item_3 = MenuItemLabel::create(labelExit, CC_CALLBACK_1(Intro::addNodes, this));
-	item_3->setAnchorPoint(Vec2(0.5f, 0.5f));
-	item_3->setPosition(Vec2(x, y));
-
-	auto menu = Menu::createWithItem(item_3);
-	menu->setPosition(Vec2::ZERO);
-	this->addChild(menu,1);
-
-	this->getPhysicsWorld()->setGravity(Vec2::ZERO);
+	this->scheduleOnce(schedule_selector(Intro::goToMenu), 5.0f);
 
     return true;
 }
 
-void Intro::addNodes(Ref* pSender)
-{
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	float x = (visibleSize.width / 2) + 60;
-	float y = (visibleSize.width / 2) + 60;
-
-	auto nodo = Sprite::create("images/nodo.png");
-	nodo->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
-	nodo->setPosition(x, y);
-	nodo->setScale(2.0f);
-	
-	auto r = random(0, 255);
-	auto g = random(0, 255);
-	auto b = random(0, 255);
-	
-	nodo->setColor(Color3B(r, g, b));
-
-	auto radiu = nodo->getContentSize().height / 2;
-
-	auto nodo_body = PhysicsBody::createCircle(radiu,PHYSICSBODY_MATERIAL_DEFAULT,Vec2(x,y));
-
-	nodo->setPhysicsBody(nodo_body);
-
-	this->addChild(nodo, 1);
-}
-
-
 void Intro::goToMenu(float dt)
 {
-	auto scene = Intro::createScene(); //Cambiar Intro por Menus
+	auto scene = Menus::createScene(); //Cambiar Intro por Menus
 	Director::getInstance()->replaceScene(TransitionFade::create(0.5f, scene));
 }
 

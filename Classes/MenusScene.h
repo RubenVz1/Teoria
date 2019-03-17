@@ -16,7 +16,9 @@ public:
 
 	void menuCloseCallback(cocos2d::Ref* pSender);
 
-	void goToMenu(Ref *sender);
+	void goToGraph(Ref *sender);
+
+	void goToDigraph(Ref *sender);
 
 	void addMenus();
 };

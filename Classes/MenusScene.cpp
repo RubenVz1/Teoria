@@ -1,5 +1,6 @@
 #include "MenusScene.h"
-#include "GrafoScene.h"
+#include "GraphScene.h"
+#include "DigraphScene.h"
 #include "SimpleAudioEngine.h"
 
 USING_NS_CC;
@@ -14,9 +15,15 @@ void Menus::MainMenu(Ref *sender)
 	cocos2d::log("-------");
 }
 
-void Menus::goToMenu(Ref *sender)
+void Menus::goToGraph(Ref *sender)
 {
-	auto scene = Grafos::createScene();
+	auto scene = Graph::createScene();
+	Director::getInstance()->replaceScene(TransitionFade::create(0.5f, scene));
+}
+
+void Menus::goToDigraph(Ref *sender)
+{
+	auto scene = Digraph::createScene();
 	Director::getInstance()->replaceScene(TransitionFade::create(0.5f, scene));
 }
 
@@ -44,7 +51,7 @@ void Menus::addMenus()
 	auto labelNewGrafo = Label::createWithTTF("Nuevo Grafo", "fonts/Marker Felt.ttf", 45);
 	labelNewGrafo->enableOutline(Color4B::BLACK, 3);
 
-	auto item_1 = MenuItemLabel::create(labelNewGrafo, CC_CALLBACK_1(Menus::goToMenu, this));
+	auto item_1 = MenuItemLabel::create(labelNewGrafo, CC_CALLBACK_1(Menus::goToGraph, this));
 	item_1->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_1->setPosition(Vec2(x, y));
 	MenuItems.pushBack(item_1);
@@ -55,7 +62,7 @@ void Menus::addMenus()
 	auto labelNewDigrafo = Label::createWithTTF("Nuevo Digrafo", "fonts/Marker Felt.ttf", 45);
 	labelNewDigrafo->enableOutline(Color4B::BLACK, 3);
 
-	auto item_2 = MenuItemLabel::create(labelNewDigrafo, CC_CALLBACK_1(Menus::MainMenu, this));
+	auto item_2 = MenuItemLabel::create(labelNewDigrafo, CC_CALLBACK_1(Menus::goToDigraph, this));
 	item_2->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_2->setPosition(Vec2(x, y));
 	MenuItems.pushBack(item_2);

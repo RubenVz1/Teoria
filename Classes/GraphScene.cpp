@@ -1,19 +1,19 @@
-#include "GrafoScene.h"
+#include "GraphScene.h"
 #include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 
-Scene* Grafos::createScene()
+Scene* Graph::createScene()
 {
-	return Grafos::create();
+	return Graph::create();
 }
 
-void Grafos::addMenus()
+void Graph::addMenus()
 {
 	cocos2d::log("hola");
 }
 
-bool Grafos::init()
+bool Graph::init()
 {
 	if (!Scene::initWithPhysics())
 	{
@@ -55,7 +55,7 @@ bool Grafos::init()
 	auto labelExit = Label::createWithTTF("Nuevo nodo", "fonts/Marker Felt.ttf", 24);
 	labelExit->enableOutline(Color4B::BLACK, 1);
 
-	auto item_1 = MenuItemLabel::create(labelExit, CC_CALLBACK_1(Grafos::addNodes, this));
+	auto item_1 = MenuItemLabel::create(labelExit, CC_CALLBACK_1(Graph::addNodes, this));
 	item_1->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_1->setPosition(Vec2(x, y));
 
@@ -70,7 +70,7 @@ bool Grafos::init()
 	auto labelExit1 = Label::createWithTTF("ZoomIn", "fonts/Marker Felt.ttf", 24);
 	labelExit1->enableOutline(Color4B::BLACK, 1);
 
-	auto item_11 = MenuItemLabel::create(labelExit1, CC_CALLBACK_1(Grafos::zoomIn, this));
+	auto item_11 = MenuItemLabel::create(labelExit1, CC_CALLBACK_1(Graph::zoomIn, this));
 	item_11->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_11->setPosition(Vec2(x, y));
 
@@ -85,7 +85,7 @@ bool Grafos::init()
 	auto labelExit111 = Label::createWithTTF("ZoomOut", "fonts/Marker Felt.ttf", 24);
 	labelExit111->enableOutline(Color4B::BLACK, 1);
 
-	auto item_112 = MenuItemLabel::create(labelExit111, CC_CALLBACK_1(Grafos::zoomOut, this));
+	auto item_112 = MenuItemLabel::create(labelExit111, CC_CALLBACK_1(Graph::zoomOut, this));
 	item_112->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_112->setPosition(Vec2(x, y));
 
@@ -97,10 +97,30 @@ bool Grafos::init()
 	//////////  Espacio de pruebas  //////////
 	//  Eliminar cuando se termine el menu  //
 	
+	auto listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [](Touch*touch, Event*event) {return true;};
+	listener->onTouchMoved = CC_CALLBACK_2(Graph::moveNode, this);
+	listener->onTouchEnded = [=](Touch*touch, Event*event) {};
+
+	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
 	return true;
 }
 
-void Grafos::addNodes(Ref* pSender)
+void Graph::moveNode(Touch* touch, Event* event)
+{
+	auto posicionToque = touch->getLocation();
+
+	for (int i = 0; i != _nodes.size() - 1;i++)
+	{
+		if (_nodes.at(i)->getBoundingBox().containsPoint(posicionToque))
+		{
+			_nodes.at(i)->setPosition(posicionToque);
+		}
+	}
+}
+
+void Graph::addNodes(Ref* pSender)
 {
 	this->setCameraMask(static_cast<unsigned short> (CameraFlag::DEFAULT), true);
 
@@ -109,29 +129,33 @@ void Grafos::addNodes(Ref* pSender)
 	float x = (visibleSize.width / 2) + 60;
 	float y = (visibleSize.height / 2) + 60;
 
-	auto nodo = Sprite::create("images/nodo.png");
-	nodo->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
-	nodo->setPosition(x, y);
-	nodo->setScale(2.0f);
+	auto node = Sprite::create("images/nodo.png");
+	node->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
+	node->setPosition(x, y);
+	node->setScale(2.0f);
 
 	auto r = random(0, 255);
 	auto g = random(0, 255);
 	auto b = random(0, 255);
 
-	nodo->setColor(Color3B(r, g, b));
+	node->setColor(Color3B(r, g, b));
 
-	auto radiu = nodo->getContentSize().height / 2;
+	auto radiu = node->getContentSize().height / 2;
 
-	auto nodo_body = PhysicsBody::createCircle(radiu, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(x, y));
+	auto node_body = PhysicsBody::createCircle(radiu, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(x, y));
 
-	nodo->setPhysicsBody(nodo_body);
+	node->setPhysicsBody(node_body);
 
-	this->addChild(nodo, 1);
+	_nodes.pushBack(node);
+
+	float index = _nodes.size() - 1;
+
+	this->addChild(_nodes.at(index), 1);
 
 	this->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 }
 
-void Grafos::zoomIn(Ref* pSender)
+void Graph::zoomIn(Ref* pSender)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	float x = visibleSize.width / 2;
@@ -140,7 +164,7 @@ void Grafos::zoomIn(Ref* pSender)
 	_camera->setPosition3D(Vec3(x, y, z));
 }
 
-void Grafos::zoomOut(Ref* pSender)
+void Graph::zoomOut(Ref* pSender)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	float x = visibleSize.width / 2;
@@ -149,7 +173,7 @@ void Grafos::zoomOut(Ref* pSender)
 	_camera->setPosition3D(Vec3(x, y, z));
 }
 
-void Grafos::cameraRight(Ref* pSender)
+void Graph::cameraRight(Ref* pSender)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	float x = _camera->getPositionX() + 10.0f;
@@ -158,7 +182,7 @@ void Grafos::cameraRight(Ref* pSender)
 	_camera->setPosition3D(Vec3(x, y, z));
 }
 
-void Grafos::cameraLeft(Ref* pSender)
+void Graph::cameraLeft(Ref* pSender)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	float x = _camera->getPositionX() - 10.0f;
@@ -167,7 +191,7 @@ void Grafos::cameraLeft(Ref* pSender)
 	_camera->setPosition3D(Vec3(x, y, z));
 }
 
-void Grafos::cameraUp(Ref* pSender)
+void Graph::cameraUp(Ref* pSender)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	float x = _camera->getPositionX();
@@ -176,7 +200,7 @@ void Grafos::cameraUp(Ref* pSender)
 	_camera->setPosition3D(Vec3(x, y, z));
 }
 
-void Grafos::cameraDown(Ref* pSender)
+void Graph::cameraDown(Ref* pSender)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	float x = _camera->getPositionX();

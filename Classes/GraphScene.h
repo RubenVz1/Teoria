@@ -32,6 +32,8 @@ public:
 
 	void addMenus();
 
+	cocos2d::Vector<cocos2d::MenuItem*> _menus;
+
 	cocos2d::Camera *_camera;
 	
 	cocos2d::Vector<cocos2d::Sprite*> _nodes;

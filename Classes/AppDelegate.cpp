@@ -85,7 +85,7 @@ bool AppDelegate::applicationDidFinishLaunching()
 
     register_all_packages();
 
-    //auto scene = Intro::createScene();
+	//auto scene = Intro::createScene();
 
 	auto scene = Graph::createScene();
 

@@ -1,6 +1,6 @@
 #include "AppDelegate.h"
-#include "IntroScene.h"
-//#include "GrafoScene.h"
+//#include "IntroScene.h"
+#include "GraphScene.h"
 
 #if USE_AUDIO_ENGINE && USE_SIMPLE_AUDIO_ENGINE
 #error "Don't use AudioEngine and SimpleAudioEngine at the same time. Please just select one in your game!"
@@ -85,9 +85,9 @@ bool AppDelegate::applicationDidFinishLaunching()
 
     register_all_packages();
 
-    auto scene = Intro::createScene();
+//    auto scene = Intro::createScene();
 
-	//auto scene = Grafos::createScene();
+	auto scene = Graph::createScene();
 
     director->runWithScene(scene);
 

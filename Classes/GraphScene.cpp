@@ -1,5 +1,6 @@
 #include "GraphScene.h"
 #include "SimpleAudioEngine.h"
+#include "ui/CocosGUI.h"
 
 USING_NS_CC;
 
@@ -104,20 +105,54 @@ bool Graph::init()
 
 	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
+	x = visibleSize.width / 2;
+	y = visibleSize.height / 2;
+
+	auto slider = ui::Slider::create();
+	slider->loadBarTexture("Slider_Back.png");
+	slider->loadSlidBallTextures("SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png");
+	slider->loadProgressBarTexture("Slider_PressBar.png");
+	slider->setPosition(Vec2(x, y));
+	slider->setRotation(270);
+
+	slider->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type)
+	{
+		switch (type)
+		{
+		case ui::Widget::TouchEventType::BEGAN:
+			break;
+		case ui::Widget::TouchEventType::ENDED:
+			break;
+		case ui::Widget::TouchEventType::MOVED:
+			cocos2d::log("slider moved2");
+			break;
+		default:
+			break;
+		}
+	});
+
+	this->addChild(slider);
+
 	return true;
 }
 
 void Graph::moveNode(Touch* touch, Event* event)
 {
-	auto posicionToque = touch->getLocation();
+	auto touchPosition = touch->getLocation();
 
-	for (int i = 0; i != _nodes.size() - 1;i++)
+	int index = -1;
+
+	for (int i = 0; i != _nodes.size() ;i++)
 	{
-		if (_nodes.at(i)->getBoundingBox().containsPoint(posicionToque))
+		if (_nodes.at(i)->getBoundingBox().containsPoint(touchPosition))
 		{
-			_nodes.at(i)->setPosition(posicionToque);
+			index = i;
 		}
 	}
+	if (index != -1)
+	{
+		_nodes.at(index)->setPosition(touchPosition);
+	}	
 }
 
 void Graph::addNodes(Ref* pSender)
@@ -151,7 +186,7 @@ void Graph::addNodes(Ref* pSender)
 	float index = _nodes.size() - 1;
 
 	this->addChild(_nodes.at(index), 1);
-
+	
 	this->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 }
 

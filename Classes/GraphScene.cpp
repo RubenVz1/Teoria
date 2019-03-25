@@ -11,7 +11,7 @@ Scene* Graph::createScene()
 
 void Graph::addMenus()
 {
-	cocos2d::Vector<cocos2d::MenuItem*> _menus;
+	cocos2d::Vector<cocos2d::MenuItem*> menus;
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -25,7 +25,7 @@ void Graph::addMenus()
 	item_1->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_1->setPosition(Vec2(x, y));
 
-	_menus.pushBack(item_1);
+	menus.pushBack(item_1);
 
 	x = visibleSize.width / 2;
 	y = 6 * visibleSize.height / 8;
@@ -37,7 +37,7 @@ void Graph::addMenus()
 	item_2->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_2->setPosition(Vec2(x, y));
 
-	_menus.pushBack(item_2);
+	menus.pushBack(item_2);
 
 	x = visibleSize.width / 2;
 	y = 5 * visibleSize.height / 8;
@@ -49,7 +49,7 @@ void Graph::addMenus()
 	item_3->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_3->setPosition(Vec2(x, y));
 
-	_menus.pushBack(item_3);
+	menus.pushBack(item_3);
 
 	x = visibleSize.width / 2;
 	y = 4 * visibleSize.height / 8;
@@ -61,7 +61,7 @@ void Graph::addMenus()
 	item_4->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_4->setPosition(Vec2(x, y));
 
-	_menus.pushBack(item_4);
+	menus.pushBack(item_4);
 
 	x = visibleSize.width / 2;
 	y = 3 * visibleSize.height / 8;
@@ -73,7 +73,7 @@ void Graph::addMenus()
 	item_5->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_5->setPosition(Vec2(x, y));
 
-	_menus.pushBack(item_5);
+	menus.pushBack(item_5);
 
 	x = visibleSize.width / 2;
 	y = 2 * visibleSize.height / 8;
@@ -85,7 +85,31 @@ void Graph::addMenus()
 	item_6->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_6->setPosition(Vec2(x, y));
 
-	_menus.pushBack(item_6);
+	menus.pushBack(item_6);
+
+	x = visibleSize.width / 4;
+	y = 2 * visibleSize.height / 8;
+
+	auto labelZoomIn = Label::createWithTTF("Zoom in", "fonts/Marker Felt.ttf", 24);
+	labelZoomIn->enableOutline(Color4B::BLACK, 1);
+
+	auto item_7 = MenuItemLabel::create(labelZoomIn, CC_CALLBACK_1(Graph::zoomIn, this));
+	item_7->setAnchorPoint(Vec2(0.5f, 0.5f));
+	item_7->setPosition(Vec2(x, y));
+
+	//menus.pushBack(item_7);  bug en listener
+
+	x = 3 * visibleSize.width / 4;
+	y = 2 * visibleSize.height / 8;
+
+	auto labelZoomOut = Label::createWithTTF("Zoom Out", "fonts/Marker Felt.ttf", 24);
+	labelZoomOut->enableOutline(Color4B::BLACK, 1);
+
+	auto item_8 = MenuItemLabel::create(labelZoomOut, CC_CALLBACK_1(Graph::zoomOut, this));
+	item_8->setAnchorPoint(Vec2(0.5f, 0.5f));
+	item_8->setPosition(Vec2(x, y));
+
+	//menus.pushBack(item_8);  bug en listener
 
 	x = visibleSize.width / 2;
 	y = 60 + visibleSize.height / 2;
@@ -94,7 +118,7 @@ void Graph::addMenus()
 	arrowDown->setAnchorPoint(Vec2(0.5f, 0.5f));
 	arrowDown->setPosition(Vec2(x, y));
 	arrowDown->setScale(0.1f);
-	_menus.pushBack(arrowDown);
+	menus.pushBack(arrowDown);
 
 	x = visibleSize.width / 2;
 	y = 120 + visibleSize.height / 2;
@@ -104,7 +128,7 @@ void Graph::addMenus()
 	arrowUp->setPosition(Vec2(x, y));
 	arrowUp->setScale(0.1f);
 	arrowUp->setRotation(180);
-	_menus.pushBack(arrowUp);
+	menus.pushBack(arrowUp);
 
 	x = 120 + visibleSize.width / 2;
 	y = visibleSize.height / 2;
@@ -114,7 +138,7 @@ void Graph::addMenus()
 	arrowRight->setPosition(Vec2(x, y));
 	arrowRight->setScale(0.1f);
 	arrowRight->setRotation(270);
-	_menus.pushBack(arrowRight);
+	menus.pushBack(arrowRight);
 
 	x = visibleSize.width / 2 - 90;
 	y = visibleSize.height / 2;
@@ -124,12 +148,13 @@ void Graph::addMenus()
 	arrowLeft->setPosition(Vec2(x, y));
 	arrowLeft->setScale(0.1f);
 	arrowLeft->setRotation(90);
-	_menus.pushBack(arrowLeft);
+	menus.pushBack(arrowLeft);
 
-	auto menu = Menu::createWithArray(_menus);
-	menu->setPosition(Vec2::ZERO);
+	_menu = Menu::createWithArray(menus);
+	_menu->setPosition(Vec2::ZERO);
+	_menu->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 
-	this->addChild(menu, 1);
+	this->addChild(_menu, 2);
 }
 
 bool Graph::init()
@@ -145,29 +170,32 @@ bool Graph::init()
 
 	float x = visibleSize.width / 2;
 	float y = visibleSize.height / 2;
-
-	auto background = Sprite::create("images/unam_logo.jpg");
-	background->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
-	background->setPosition(x, y);
-	background->setScale(0.6f);
-
-	this->addChild(background, 0);
-
-	x = visibleSize.width / 2;
-	y = visibleSize.height / 2;
 	float z = this->getDefaultCamera()->getPositionZ();
-
-	this->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 
 	_camera = Camera::createPerspective(60, visibleSize.width / visibleSize.height, 100, 1100);
 	_camera->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
 	_camera->setPosition3D(Vec3(x, y, z));
 	_camera->setCameraFlag(CameraFlag::USER1);
 
+	this->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
+
 	this->addChild(_camera, 3);
 
+	_deviation = Vec2::Vec2(0,0);
+
+	x = visibleSize.width / 2;
+	y = visibleSize.height / 2;
+
+	auto background = Sprite::create("images/unam_logo.jpg");
+	background->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
+	background->setPosition(x, y);
+	background->setScale(0.6f);
+	background->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
+
+	this->addChild(background, 0);
+
 	addMenus();
-	
+
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = [](Touch*touch, Event*event) {return true;};
 	listener->onTouchMoved = CC_CALLBACK_2(Graph::moveNode, this);
@@ -175,40 +203,15 @@ bool Graph::init()
 
 	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
-	x = 7 * visibleSize.width / 8;
-	y = visibleSize.height / 2;
-
-	auto slider = ui::Slider::create();
-	slider->loadBarTexture("Slider_Back.png");
-	slider->loadSlidBallTextures("SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png");
-	slider->loadProgressBarTexture("Slider_PressBar.png");
-	slider->setPosition(Vec2(x, y));
-	slider->setRotation(270);
-
-	slider->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type)
-	{
-		switch (type)
-		{
-		case ui::Widget::TouchEventType::BEGAN:
-			break;
-		case ui::Widget::TouchEventType::ENDED:
-			break;
-		case ui::Widget::TouchEventType::MOVED:
-			cocos2d::log("slider moved2");
-			break;
-		default:
-			break;
-		}
-	});
-
-	this->addChild(slider);
-
 	return true;
 }
 
 void Graph::moveNode(Touch* touch, Event* event)
 {
 	auto touchPosition = touch->getLocation();
+
+	touchPosition.x += _deviation.x;
+	touchPosition.y += _deviation.y;
 
 	int index = -1;
 
@@ -218,26 +221,34 @@ void Graph::moveNode(Touch* touch, Event* event)
 		{
 			index = i;
 		}
+		if (index_selected != index)
+		{
+			for (int i = 0; i != _nodes.size(); i++)
+			{
+				_nodes.at(i)->setScale(0.3f); //sustituir por primera funcion
+			}
+		}
 	}
 	if (index != -1)
 	{
 		_nodes.at(index)->setPosition(touchPosition);
-	}	
+		_nodes.at(index)->setScale(0.4f);  // sustituir por segunda funcion
+	}
+	index_selected = index;
 }
 
 void Graph::addNodes(Ref* pSender)
 {
-	this->setCameraMask(static_cast<unsigned short> (CameraFlag::DEFAULT), true);
-
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
 	float x = (visibleSize.width / 2) + 60;
 	float y = (visibleSize.height / 2) + 60;
 
-	auto node = Sprite::create("images/nodo.png");
+	auto node = Sprite::create("images/node_1.png");
 	node->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
 	node->setPosition(x, y);
-	node->setScale(2.0f);
+	node->setScale(0.3f);
+	node->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 
 	auto r = random(0, 255);
 	auto g = random(0, 255);
@@ -246,70 +257,103 @@ void Graph::addNodes(Ref* pSender)
 	node->setColor(Color3B(r, g, b));
 
 	auto radiu = node->getContentSize().height / 2;
-
 	auto node_body = PhysicsBody::createCircle(radiu, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(x, y));
-
 	node->setPhysicsBody(node_body);
 
 	_nodes.pushBack(node);
-
 	float index = _nodes.size() - 1;
-
 	this->addChild(_nodes.at(index), 1);
-	
-	this->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 }
 
 void Graph::zoomIn(Ref* pSender)
 {
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	float x = visibleSize.width / 2;
-	float y = visibleSize.height / 2;
-	float z = _camera->getPositionZ() + 10.0f;
-	_camera->setPosition3D(Vec3(x, y, z));
+	auto position3Ds = _camera->getPosition3D();
+	position3Ds.z -= 10.0f;
+	_camera->setPosition3D(position3Ds);
+
+	position3Ds = _menu->getPosition3D();
+	position3Ds.z -= 10.0f;
+	_menu->setPosition3D(position3Ds);
 }
 
 void Graph::zoomOut(Ref* pSender)
 {
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	float x = visibleSize.width / 2;
-	float y = visibleSize.height / 2;
-	float z = _camera->getPositionZ() - 10.0f;
-	_camera->setPosition3D(Vec3(x, y, z));
+	auto position3Ds = _camera->getPosition3D();
+	position3Ds.z += 10.0f;
+	_camera->setPosition3D(position3Ds);
+
+	position3Ds = _menu->getPosition3D();
+	position3Ds.z += 10.0f;
+	_menu->setPosition3D(position3Ds);
 }
 
 void Graph::cameraRight(Ref* pSender)
 {
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	float x = _camera->getPositionX() + 10.0f;
-	float y = _camera->getPositionY();
-	float z = _camera->getPositionZ();
-	_camera->setPosition3D(Vec3(x, y, z));
+	if (_deviation.x >= 530)
+	{
+		return;
+	}
+	auto position2Ds = _menu->getPosition();
+	position2Ds.x += 10.0f;
+	_menu->setPosition(position2Ds);
+
+	auto position3Ds = _camera->getPosition3D();
+	position3Ds.x += 10.0f;
+	_camera->setPosition3D(position3Ds);
+
+	_deviation.x += 10.0f;
 }
 
 void Graph::cameraLeft(Ref* pSender)
 {
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	float x = _camera->getPositionX() - 10.0f;
-	float y = _camera->getPositionY();
-	float z = _camera->getPositionZ();
-	_camera->setPosition3D(Vec3(x, y, z));
+	if (_deviation.x <= -530)
+	{
+		return;
+	}
+
+	auto position2Ds = _menu->getPosition();
+	position2Ds.x -= 10.0f;
+	_menu->setPosition(position2Ds);
+
+	auto position3Ds = _camera->getPosition3D();
+	position3Ds.x -= 10.0f;
+	_camera->setPosition3D(position3Ds);
+
+	_deviation.x -= 10.0f;
 }
 
 void Graph::cameraUp(Ref* pSender)
 {
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	float x = _camera->getPositionX();
-	float y = _camera->getPositionY() + 10.0f;
-	float z = _camera->getPositionZ();
-	_camera->setPosition3D(Vec3(x, y, z));
+	if (_deviation.y >= 530)
+	{
+		return;
+	}
+
+	auto position2Ds = _menu->getPosition();
+	position2Ds.y += 10.0f;
+	_menu->setPosition(position2Ds);
+
+	auto position3Ds = _camera->getPosition3D();
+	position3Ds.y += 10.0f;
+	_camera->setPosition3D(position3Ds);
+
+	_deviation.y += 10.0f;
 }
 
 void Graph::cameraDown(Ref* pSender)
 {
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	float x = _camera->getPositionX();
-	float y = _camera->getPositionY() - 10.0f ;
-	float z = _camera->getPositionZ();
-	_camera->setPosition3D(Vec3(x, y, z));
+	if (_deviation.y <= -530)
+	{
+		return;
+	}
+
+	auto position2Ds = _menu->getPosition();
+	position2Ds.y -= 10.0f;
+	_menu->setPosition(position2Ds);
+
+	auto position3Ds = _camera->getPosition3D();
+	position3Ds.y -= 10.0f;
+	_camera->setPosition3D(position3Ds);
+
+	_deviation.y -= 10.0f;
 }

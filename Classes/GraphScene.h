@@ -32,11 +32,15 @@ public:
 
 	void addMenus();
 
-	cocos2d::Vector<cocos2d::MenuItem*> _menus;
+	cocos2d::Menu* _menu;
 
 	cocos2d::Camera *_camera;
 	
 	cocos2d::Vector<cocos2d::Sprite*> _nodes;
+
+	cocos2d::Vec2 _deviation;
+
+	int index_selected;
 };
 
 #endif // __GRAPH_SCENE_H__

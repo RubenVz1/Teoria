@@ -12,7 +12,7 @@ public:
 
 	CREATE_FUNC(Graph);
 
-	void NewGrafo(Ref *sender);
+	void NewGrafo(Ref* sender);
 
 	void addNodes(Ref* pSender);
 
@@ -30,9 +30,23 @@ public:
 
 	void moveNode(cocos2d::Touch* touch, cocos2d::Event* event);
 
+	bool clickNode(cocos2d::Touch* touch, cocos2d::Event* event);
+
 	void addMenus();
 
-	cocos2d::Menu* _menu;
+	void goToMenus(Ref* sender);
+
+	void newRelation(Ref* sender);
+
+	void deleteNode(Ref* sender);
+
+	void viewMatrix(Ref* sender);
+
+	void createRelation(int indexNode1,int indexNode2);
+
+	cocos2d::Menu* _menu_1;
+
+	cocos2d::Menu* _menu_2;
 
 	cocos2d::Camera *_camera;
 	
@@ -41,6 +55,8 @@ public:
 	cocos2d::Vec2 _deviation;
 
 	int index_selected;
+
+	bool relation_selected;
 };
 
 #endif // __GRAPH_SCENE_H__

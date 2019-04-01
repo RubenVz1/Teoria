@@ -1,6 +1,6 @@
 #include "GraphScene.h"
+#include "MenusScene.h"
 #include "SimpleAudioEngine.h"
-#include "ui/CocosGUI.h"
 
 USING_NS_CC;
 
@@ -33,7 +33,7 @@ void Graph::addMenus()
 	auto labelNewRelation = Label::createWithTTF("Nueva Relacion", "fonts/Marker Felt.ttf", 24);
 	labelNewRelation->enableOutline(Color4B::BLACK, 1);
 
-	auto item_2 = MenuItemLabel::create(labelNewRelation, CC_CALLBACK_1(Graph::addNodes, this));
+	auto item_2 = MenuItemLabel::create(labelNewRelation, CC_CALLBACK_1(Graph::newRelation, this));
 	item_2->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_2->setPosition(Vec2(x, y));
 
@@ -45,7 +45,7 @@ void Graph::addMenus()
 	auto labelDeleteNode = Label::createWithTTF("Borrar Nodo", "fonts/Marker Felt.ttf", 24);
 	labelDeleteNode->enableOutline(Color4B::BLACK, 1);
 
-	auto item_3 = MenuItemLabel::create(labelDeleteNode, CC_CALLBACK_1(Graph::addNodes, this));
+	auto item_3 = MenuItemLabel::create(labelDeleteNode, CC_CALLBACK_1(Graph::deleteNode, this));
 	item_3->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_3->setPosition(Vec2(x, y));
 
@@ -69,7 +69,7 @@ void Graph::addMenus()
 	auto labelViewMatrix = Label::createWithTTF("Matriz", "fonts/Marker Felt.ttf", 24);
 	labelViewMatrix->enableOutline(Color4B::BLACK, 1);
 
-	auto item_5 = MenuItemLabel::create(labelViewMatrix, CC_CALLBACK_1(Graph::addNodes, this));
+	auto item_5 = MenuItemLabel::create(labelViewMatrix, CC_CALLBACK_1(Graph::viewMatrix, this));
 	item_5->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_5->setPosition(Vec2(x, y));
 
@@ -81,7 +81,7 @@ void Graph::addMenus()
 	auto labelReturn = Label::createWithTTF("Regresar", "fonts/Marker Felt.ttf", 24);
 	labelReturn->enableOutline(Color4B::BLACK, 1);
 
-	auto item_6 = MenuItemLabel::create(labelReturn, CC_CALLBACK_1(Graph::addNodes, this));
+	auto item_6 = MenuItemLabel::create(labelReturn, CC_CALLBACK_1(Graph::goToMenus, this));
 	item_6->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_6->setPosition(Vec2(x, y));
 
@@ -97,7 +97,7 @@ void Graph::addMenus()
 	item_7->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_7->setPosition(Vec2(x, y));
 
-	//menus.pushBack(item_7);  bug en listener
+	//menus.pushBack(item_7);
 
 	x = 3 * visibleSize.width / 4;
 	y = 2 * visibleSize.height / 8;
@@ -109,7 +109,7 @@ void Graph::addMenus()
 	item_8->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_8->setPosition(Vec2(x, y));
 
-	//menus.pushBack(item_8);  bug en listener
+	//menus.pushBack(item_8);
 
 	x = visibleSize.width / 2;
 	y = 60 + visibleSize.height / 2;
@@ -118,6 +118,7 @@ void Graph::addMenus()
 	arrowDown->setAnchorPoint(Vec2(0.5f, 0.5f));
 	arrowDown->setPosition(Vec2(x, y));
 	arrowDown->setScale(0.1f);
+
 	menus.pushBack(arrowDown);
 
 	x = visibleSize.width / 2;
@@ -128,6 +129,7 @@ void Graph::addMenus()
 	arrowUp->setPosition(Vec2(x, y));
 	arrowUp->setScale(0.1f);
 	arrowUp->setRotation(180);
+
 	menus.pushBack(arrowUp);
 
 	x = 120 + visibleSize.width / 2;
@@ -138,6 +140,7 @@ void Graph::addMenus()
 	arrowRight->setPosition(Vec2(x, y));
 	arrowRight->setScale(0.1f);
 	arrowRight->setRotation(270);
+
 	menus.pushBack(arrowRight);
 
 	x = visibleSize.width / 2 - 90;
@@ -148,13 +151,36 @@ void Graph::addMenus()
 	arrowLeft->setPosition(Vec2(x, y));
 	arrowLeft->setScale(0.1f);
 	arrowLeft->setRotation(90);
+
 	menus.pushBack(arrowLeft);
 
-	_menu = Menu::createWithArray(menus);
-	_menu->setPosition(Vec2::ZERO);
-	_menu->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
+	_menu_1 = Menu::createWithArray(menus);
+	_menu_1->setPosition(Vec2::ZERO);
+	_menu_1->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 
-	this->addChild(_menu, 2);
+	this->addChild(_menu_1, 3);
+
+	/*******************************************************************************************************/
+	cocos2d::Vector<cocos2d::MenuItem*> menus_2;
+
+	x = 3 * visibleSize.width / 4;
+	y = 6 * visibleSize.height / 8;
+
+	auto labelBack = Label::createWithTTF("Regresar", "fonts/Marker Felt.ttf", 24);
+	labelBack->enableOutline(Color4B::BLACK, 1);
+
+	auto item_12 = MenuItemLabel::create(labelBack, CC_CALLBACK_1(Graph::viewMatrix, this));
+	item_12->setAnchorPoint(Vec2(0.5f, 0.5f));
+	item_12->setPosition(Vec2(x, y));
+
+	menus_2.pushBack(item_12);
+
+	_menu_2 = Menu::createWithArray(menus_2);
+	_menu_2->setPosition(Vec2::ZERO);
+	_menu_2->setOpacity(0.0f);
+	_menu_2->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
+
+	this->addChild(_menu_2, 3);
 }
 
 bool Graph::init()
@@ -179,9 +205,10 @@ bool Graph::init()
 
 	this->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 
-	this->addChild(_camera, 3);
+	this->addChild(_camera, 4);
 
 	_deviation = Vec2::Vec2(0,0);
+	index_selected = -1;
 
 	x = visibleSize.width / 2;
 	y = visibleSize.height / 2;
@@ -196,8 +223,10 @@ bool Graph::init()
 
 	addMenus();
 
+	relation_selected = false;
+
 	auto listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [](Touch*touch, Event*event) {return true;};
+	listener->onTouchBegan = CC_CALLBACK_2(Graph::clickNode, this);
 	listener->onTouchMoved = CC_CALLBACK_2(Graph::moveNode, this);
 	listener->onTouchEnded = [=](Touch*touch, Event*event) {};
 
@@ -206,7 +235,15 @@ bool Graph::init()
 	return true;
 }
 
-void Graph::moveNode(Touch* touch, Event* event)
+void Graph::newRelation(Ref* sender)
+{
+	if (index_selected != -1)
+	{
+		relation_selected = true;
+	}
+}
+
+bool Graph::clickNode(Touch* touch, Event* event)
 {
 	auto touchPosition = touch->getLocation();
 
@@ -215,7 +252,7 @@ void Graph::moveNode(Touch* touch, Event* event)
 
 	int index = -1;
 
-	for (int i = 0; i != _nodes.size() ;i++)
+	for (int i = 0; i != _nodes.size();i++)
 	{
 		if (_nodes.at(i)->getBoundingBox().containsPoint(touchPosition))
 		{
@@ -229,12 +266,59 @@ void Graph::moveNode(Touch* touch, Event* event)
 			}
 		}
 	}
+	if (index == -1 || index_selected == -1)
+	{
+		relation_selected = false;
+	}
+	if (relation_selected)
+	{
+		createRelation(index_selected, index);
+		relation_selected = false;
+		return true;
+	}
 	if (index != -1)
 	{
-		_nodes.at(index)->setPosition(touchPosition);
 		_nodes.at(index)->setScale(0.4f);  // sustituir por segunda funcion
 	}
+
 	index_selected = index;
+
+	return true;
+}
+
+void Graph::createRelation(int indexNode1, int indexNode2)
+{
+	cocos2d::log("Relacion entre %d y %d", indexNode1, indexNode2);
+	/*
+	auto position = _nodes.at(indexNode1)->getPosition();
+
+	auto node = Sprite::create("images/arrow.png");
+	node->setAnchorPoint(Vec2(0.0f, 0.5f));
+	node->setPosition(position);
+	node->setScale(0.3f);
+	node->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
+
+	auto r = random(0, 255);
+	auto g = random(0, 255);
+	auto b = random(0, 255);
+
+	node->setColor(Color3B(r, g, b));
+
+	this->addChild(node, 1);
+	*/
+}
+
+void Graph::moveNode(Touch* touch, Event* event)
+{
+	if (index_selected != -1)
+	{
+		auto touchPosition = touch->getLocation();
+
+		touchPosition.x += _deviation.x;
+		touchPosition.y += _deviation.y;
+
+		_nodes.at(index_selected)->setPosition(touchPosition);
+	}
 }
 
 void Graph::addNodes(Ref* pSender)
@@ -262,7 +346,7 @@ void Graph::addNodes(Ref* pSender)
 
 	_nodes.pushBack(node);
 	float index = _nodes.size() - 1;
-	this->addChild(_nodes.at(index), 1);
+	this->addChild(_nodes.at(index), 2);
 }
 
 void Graph::zoomIn(Ref* pSender)
@@ -271,9 +355,9 @@ void Graph::zoomIn(Ref* pSender)
 	position3Ds.z -= 10.0f;
 	_camera->setPosition3D(position3Ds);
 
-	position3Ds = _menu->getPosition3D();
+	position3Ds = _menu_1->getPosition3D();
 	position3Ds.z -= 10.0f;
-	_menu->setPosition3D(position3Ds);
+	_menu_1->setPosition3D(position3Ds);
 }
 
 void Graph::zoomOut(Ref* pSender)
@@ -282,9 +366,9 @@ void Graph::zoomOut(Ref* pSender)
 	position3Ds.z += 10.0f;
 	_camera->setPosition3D(position3Ds);
 
-	position3Ds = _menu->getPosition3D();
+	position3Ds = _menu_1->getPosition3D();
 	position3Ds.z += 10.0f;
-	_menu->setPosition3D(position3Ds);
+	_menu_1->setPosition3D(position3Ds);
 }
 
 void Graph::cameraRight(Ref* pSender)
@@ -293,9 +377,10 @@ void Graph::cameraRight(Ref* pSender)
 	{
 		return;
 	}
-	auto position2Ds = _menu->getPosition();
+	auto position2Ds = _menu_1->getPosition();
 	position2Ds.x += 10.0f;
-	_menu->setPosition(position2Ds);
+	_menu_1->setPosition(position2Ds);
+	_menu_2->setPosition(position2Ds);
 
 	auto position3Ds = _camera->getPosition3D();
 	position3Ds.x += 10.0f;
@@ -311,9 +396,10 @@ void Graph::cameraLeft(Ref* pSender)
 		return;
 	}
 
-	auto position2Ds = _menu->getPosition();
+	auto position2Ds = _menu_1->getPosition();
 	position2Ds.x -= 10.0f;
-	_menu->setPosition(position2Ds);
+	_menu_1->setPosition(position2Ds);
+	_menu_2->setPosition(position2Ds);
 
 	auto position3Ds = _camera->getPosition3D();
 	position3Ds.x -= 10.0f;
@@ -329,9 +415,10 @@ void Graph::cameraUp(Ref* pSender)
 		return;
 	}
 
-	auto position2Ds = _menu->getPosition();
+	auto position2Ds = _menu_1->getPosition();
 	position2Ds.y += 10.0f;
-	_menu->setPosition(position2Ds);
+	_menu_1->setPosition(position2Ds);
+	_menu_2->setPosition(position2Ds);
 
 	auto position3Ds = _camera->getPosition3D();
 	position3Ds.y += 10.0f;
@@ -347,13 +434,45 @@ void Graph::cameraDown(Ref* pSender)
 		return;
 	}
 
-	auto position2Ds = _menu->getPosition();
+	auto position2Ds = _menu_1->getPosition();
 	position2Ds.y -= 10.0f;
-	_menu->setPosition(position2Ds);
+	_menu_1->setPosition(position2Ds);
+	_menu_2->setPosition(position2Ds);
 
 	auto position3Ds = _camera->getPosition3D();
 	position3Ds.y -= 10.0f;
 	_camera->setPosition3D(position3Ds);
 
 	_deviation.y -= 10.0f;
+}
+
+void Graph::goToMenus(Ref *sender)
+{
+	auto scene = Menus::createScene();
+	Director::getInstance()->replaceScene(TransitionFade::create(0.5f, scene));
+}
+
+void Graph::deleteNode(Ref *sender)
+{
+	if (index_selected != -1)
+	{
+		this->removeChild(_nodes.at(index_selected));
+	}
+	cocos2d::log("index: %d", index_selected);
+	index_selected = -1;
+}
+
+void Graph::viewMatrix(Ref *sender)
+{
+	auto condition = (_menu_1->getOpacity() == 0.0f);
+	if (condition)
+	{
+		_menu_1->setOpacity(255.0f);
+		_menu_2->setOpacity(0.0f);
+	}
+	else
+	{
+		_menu_1->setOpacity(0.0f);
+		_menu_2->setOpacity(255.0f);
+	}
 }

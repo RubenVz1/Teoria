@@ -1,12 +1,23 @@
 #include "GraphScene.h"
 #include "MenusScene.h"
 #include "SimpleAudioEngine.h"
+#include <cmath>
 
 USING_NS_CC;
 
 Scene* Graph::createScene()
 {
-	return Graph::create();
+
+	//******************* prueba *******************//
+	auto scene = Scene::createWithPhysics();
+	scene->getPhysicsWorld()->setGravity(Vec2::ZERO);
+	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	auto layer = Graph::create();
+	scene->addChild(layer);
+	return scene;
+	//******************* prueba *******************//
+
+	//return Graph::create(); **** Agregar cuando la prueba termine ****
 }
 
 void Graph::addMenus()
@@ -185,12 +196,13 @@ void Graph::addMenus()
 
 bool Graph::init()
 {
-	if (!Scene::initWithPhysics())
+	//if (!Scene::initWithPhysics()) **** Agregar cuando la prueba termine ****
+	if(!Scene::init())
 	{
 		return false;
 	}
 
-	this->getPhysicsWorld()->setGravity(Vec2::ZERO);
+	//this->getPhysicsWorld()->setGravity(Vec2::ZERO);  **** Agregar cuando la prueba termine ****
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -217,6 +229,7 @@ bool Graph::init()
 	background->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
 	background->setPosition(x, y);
 	background->setScale(0.6f);
+	background->setOpacity(80);
 	background->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 
 	this->addChild(background, 0);
@@ -286,26 +299,60 @@ bool Graph::clickNode(Touch* touch, Event* event)
 	return true;
 }
 
+float Graph::distance(int indexNode1, int indexNode2)
+{
+	auto position1 = _nodes.at(indexNode1)->getPosition();
+	auto position2 = _nodes.at(indexNode2)->getPosition();
+
+	auto x = position1.x - position2.x;
+	auto y = position1.y - position2.y;
+
+	auto distance = sqrt(pow(x, 2) + pow(y, 2));
+
+	return distance;
+}
+
+float Graph::angle(int indexNode1, int indexNode2)
+{
+	auto position1 = _nodes.at(indexNode1)->getPosition();
+	auto position2 = _nodes.at(indexNode2)->getPosition();
+	auto delta_position = position1;
+	
+	position1.x -= delta_position.x;
+	position1.y -= delta_position.y;
+	position2.x -= delta_position.x;
+	position2.y -= delta_position.y;
+	
+	auto angle = atan(position2.y / position2.x);
+	angle = angle*(360 / (M_PI * 2));
+
+	auto condition = (position2.x < 0 && position2.y > 0) || (position2.x < 0 && position2.y < 0);
+	if (condition)
+		angle = 180 + angle;
+	return angle;
+}
+
 void Graph::createRelation(int indexNode1, int indexNode2)
 {
-	cocos2d::log("Relacion entre %d y %d", indexNode1, indexNode2);
-	/*
-	auto position = _nodes.at(indexNode1)->getPosition();
+	auto position1 = _nodes.at(indexNode1)->getPosition();
+	auto relation = Sprite::create("images/arrow.png");
+	relation->setAnchorPoint(Vec2(0.0f, 0.5f));
+	relation->setPosition(position1);
+	float aux = distance(indexNode1, indexNode2) / relation->getBoundingBox().size.width;
+	float angleNodes = -1*angle(indexNode1, indexNode2);
+	relation->setRotation(angleNodes);
+	relation->setScaleX(aux);
+	relation->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 
-	auto node = Sprite::create("images/arrow.png");
-	node->setAnchorPoint(Vec2(0.0f, 0.5f));
-	node->setPosition(position);
-	node->setScale(0.3f);
-	node->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
+	auto rect = relation->getContentSize();
+	auto positionNode = Vec2::ZERO;
 
 	auto r = random(0, 255);
 	auto g = random(0, 255);
 	auto b = random(0, 255);
 
-	node->setColor(Color3B(r, g, b));
-
-	this->addChild(node, 1);
-	*/
+	relation->setColor(Color3B(r, g, b));
+	this->addChild(relation, 1);
 }
 
 void Graph::moveNode(Touch* touch, Event* event)
@@ -323,14 +370,11 @@ void Graph::moveNode(Touch* touch, Event* event)
 
 void Graph::addNodes(Ref* pSender)
 {
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-
-	float x = (visibleSize.width / 2) + 60;
-	float y = (visibleSize.height / 2) + 60;
+	auto position = _camera->getPosition();
 
 	auto node = Sprite::create("images/node_1.png");
 	node->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
-	node->setPosition(x, y);
+	node->setPosition(position);
 	node->setScale(0.3f);
 	node->setCameraMask(static_cast<unsigned short> (CameraFlag::USER1), true);
 
@@ -341,8 +385,10 @@ void Graph::addNodes(Ref* pSender)
 	node->setColor(Color3B(r, g, b));
 
 	auto radiu = node->getContentSize().height / 2;
-	auto node_body = PhysicsBody::createCircle(radiu, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(x, y));
+	auto positionNode = Vec2::ZERO; //issue
+	auto node_body = PhysicsBody::createCircle(radiu, PHYSICSBODY_MATERIAL_DEFAULT, positionNode);
 	node->setPhysicsBody(node_body);
+	
 
 	_nodes.pushBack(node);
 	float index = _nodes.size() - 1;
@@ -387,6 +433,13 @@ void Graph::cameraRight(Ref* pSender)
 	_camera->setPosition3D(position3Ds);
 
 	_deviation.x += 10.0f;
+
+	for (int i = 0 ; i < _nodes.size() ; i++)
+	{
+		auto positionNode = _nodes.at(i)->getPhysicsBody()->getPositionOffset();
+		positionNode.x -= 10.0f;
+		_nodes.at(i)->getPhysicsBody()->setPositionOffset(positionNode);
+	}
 }
 
 void Graph::cameraLeft(Ref* pSender)
@@ -406,6 +459,13 @@ void Graph::cameraLeft(Ref* pSender)
 	_camera->setPosition3D(position3Ds);
 
 	_deviation.x -= 10.0f;
+
+	for (int i = 0; i < _nodes.size(); i++)
+	{
+		auto positionNode = _nodes.at(i)->getPhysicsBody()->getPositionOffset();
+		positionNode.x += 10.0f;
+		_nodes.at(i)->getPhysicsBody()->setPositionOffset(positionNode);
+	}
 }
 
 void Graph::cameraUp(Ref* pSender)
@@ -425,6 +485,13 @@ void Graph::cameraUp(Ref* pSender)
 	_camera->setPosition3D(position3Ds);
 
 	_deviation.y += 10.0f;
+
+	for (int i = 0; i < _nodes.size(); i++)
+	{
+		auto positionNode = _nodes.at(i)->getPhysicsBody()->getPositionOffset();
+		positionNode.y -= 10.0f;
+		_nodes.at(i)->getPhysicsBody()->setPositionOffset(positionNode);
+	}
 }
 
 void Graph::cameraDown(Ref* pSender)
@@ -444,6 +511,13 @@ void Graph::cameraDown(Ref* pSender)
 	_camera->setPosition3D(position3Ds);
 
 	_deviation.y -= 10.0f;
+
+	for (int i = 0; i < _nodes.size(); i++)
+	{
+		auto positionNode = _nodes.at(i)->getPhysicsBody()->getPositionOffset();
+		positionNode.y += 10.0f;
+		_nodes.at(i)->getPhysicsBody()->setPositionOffset(positionNode);
+	}
 }
 
 void Graph::goToMenus(Ref *sender)

@@ -44,6 +44,10 @@ public:
 
 	void createRelation(int indexNode1,int indexNode2);
 
+	float distance(int indexNode1, int indexNode2);
+
+	float angle(int indexNode1, int indexNode2);
+
 	cocos2d::Menu* _menu_1;
 
 	cocos2d::Menu* _menu_2;

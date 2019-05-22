@@ -611,6 +611,17 @@ void Digraph::createRelation(int indexNode1, int indexNode2)
 	{
 		return;
 	}
+
+	for (int i = 0; i < 43; i++)
+	{
+		if (_joints[i].bodyNode == indexNode1 && _joints[i + 1].bodyNode == indexNode2)
+		{
+			cocos2d::log("ya existe una relacion entre ambos");
+			return;
+		}
+
+	}
+
 	auto relation = Sprite::create("images/arrow.png");
 	auto rect = relation->getContentSize();
 	auto relationBody = PhysicsBody::createBox(rect, PHYSICSBODY_MATERIAL_DEFAULT, Vec2::ZERO);
@@ -989,6 +1000,12 @@ void Digraph::viewMatrixAdjacency(Ref* sender)
 	for (int i = 0; i < _MatrixIncidence.size(); i++)
 		this->removeChild(_MatrixIncidence.at(i));
 	_MatrixIncidence.clear();
+
+	if (!_nodes.size())
+	{
+		cocos2d::log("no hay nodos");
+		return;
+	}
 
 	float x = 0;
 	float y = 0;

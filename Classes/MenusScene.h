@@ -12,13 +12,15 @@ public:
 
     CREATE_FUNC(Menus);
 
-	void MainMenu(Ref *sender);
+	void goToIntro(Ref *sender);
 
 	void menuCloseCallback(cocos2d::Ref* pSender);
 
 	void goToGraph(Ref *sender);
 
 	void goToDigraph(Ref *sender);
+
+	void MainMenu(Ref *sender);
 
 	void addMenus();
 };

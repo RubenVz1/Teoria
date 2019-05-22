@@ -83,7 +83,7 @@ public:
 		int bodyEdge;
 	};
 
-	joint _joints[200];
+	joint _joints[45];
 
 	int jointssize;
 

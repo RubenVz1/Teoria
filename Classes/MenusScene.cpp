@@ -1,6 +1,7 @@
 #include "MenusScene.h"
 #include "GraphScene.h"
 #include "DigraphScene.h"
+#include "IntroScene.h"
 #include "SimpleAudioEngine.h"
 
 USING_NS_CC;
@@ -10,9 +11,10 @@ Scene* Menus::createScene()
     return Menus::create();
 }
 
-void Menus::MainMenu(Ref *sender)
+void Menus::goToIntro(Ref *sender)
 {
-	cocos2d::log("-------");
+	auto scene = Intro::createScene();
+	Director::getInstance()->replaceScene(TransitionFade::create(0.5f, scene));
 }
 
 void Menus::goToGraph(Ref *sender)
@@ -25,6 +27,11 @@ void Menus::goToDigraph(Ref *sender)
 {
 	auto scene = Digraph::createScene();
 	Director::getInstance()->replaceScene(TransitionFade::create(0.5f, scene));
+}
+
+void Menus::MainMenu(Ref *sender)
+{
+	cocos2d::log("-----");
 }
 
 void Menus::addMenus()
@@ -70,10 +77,10 @@ void Menus::addMenus()
 	x = visibleSize.width / 2;
 	y = 3 * visibleSize.height / 8;
 
-	auto labelSettings = Label::createWithTTF("Configuraciones", "fonts/Marker Felt.ttf", 45);
+	auto labelSettings = Label::createWithTTF("Creditos", "fonts/Marker Felt.ttf", 45);
 	labelSettings->enableOutline(Color4B::BLACK, 3);
 
-	auto item_3 = MenuItemLabel::create(labelSettings, CC_CALLBACK_1(Menus::MainMenu, this));
+	auto item_3 = MenuItemLabel::create(labelSettings, CC_CALLBACK_1(Menus::goToIntro, this));
 	item_3->setAnchorPoint(Vec2(0.5f, 0.5f));
 	item_3->setPosition(Vec2(x, y));
 	MenuItems.pushBack(item_3);
@@ -118,7 +125,6 @@ bool Menus::init()
 
     return true;
 }
-
 
 void Menus::menuCloseCallback(Ref* pSender)
 {
